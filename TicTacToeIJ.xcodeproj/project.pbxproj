@@ -13,6 +13,7 @@
 		C6A8616C1C498A8000C3156C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6A8616A1C498A8000C3156C /* Main.storyboard */; };
 		C6A8616E1C498A8000C3156C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C6A8616D1C498A8000C3156C /* Assets.xcassets */; };
 		C6A861711C498A8000C3156C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C6A8616F1C498A8000C3156C /* LaunchScreen.storyboard */; };
+		C6A8617A1C49B1A500C3156C /* Tile.m in Sources */ = {isa = PBXBuildFile; fileRef = C6A861791C49B1A500C3156C /* Tile.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		C6A8616D1C498A8000C3156C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C6A861701C498A8000C3156C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C6A861721C498A8000C3156C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C6A861781C49B1A500C3156C /* Tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tile.h; sourceTree = "<group>"; };
+		C6A861791C49B1A500C3156C /* Tile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tile.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 			children = (
 				C6A861671C498A8000C3156C /* ViewController.h */,
 				C6A861681C498A8000C3156C /* ViewController.m */,
+				C6A861781C49B1A500C3156C /* Tile.h */,
+				C6A861791C49B1A500C3156C /* Tile.m */,
 				C6A8616A1C498A8000C3156C /* Main.storyboard */,
 				C6A8616D1C498A8000C3156C /* Assets.xcassets */,
 				C6A8616F1C498A8000C3156C /* LaunchScreen.storyboard */,
@@ -152,6 +157,7 @@
 				C6A861691C498A8000C3156C /* ViewController.m in Sources */,
 				C6A861661C498A8000C3156C /* AppDelegate.m in Sources */,
 				C6A861631C498A8000C3156C /* main.m in Sources */,
+				C6A8617A1C49B1A500C3156C /* Tile.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
