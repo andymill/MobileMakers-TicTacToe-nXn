@@ -22,7 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.gridSize = 3;
+    self.gridSize = 5;
     self.movesMade = 0;
     [self makeGridOfColumns:self.gridSize andRows:self.gridSize];
 }
@@ -69,126 +69,149 @@
 }
 
 -(bool)isWinnerWithArray:(NSMutableArray *)arr withGridSize:(int)gridSize{
-    int max = [[arr valueForKeyPath:@"@max.intValue"] intValue];
     
-    if (max == gridSize){
+    int minSum = 0;
+    int maxSum = 0;
+    for (NSMutableArray *obj in arr){
+        int objSum = 0;
+        for (NSNumber *element in obj){
+            objSum = objSum + [element integerValue];
+        }
+        if (objSum > maxSum){
+            maxSum = objSum;
+        }
+        if (objSum < minSum) {
+            minSum = objSum;
+        }
+    }
+    NSLog(@"winning maxSum is %d minSum %d", maxSum, minSum);
+    NSMutableArray *debugginArr = arr;
+    if (maxSum == gridSize || abs(minSum) == gridSize){
         return YES;
     } else {
         return NO;
     }
 }
 
--(NSMutableArray *)sumRowsColumnsAndDiagonals:(NSMutableArray *)array{
+-(NSMutableArray *)colRowDiagStates:(NSMutableArray *)array{
     // given an nxn array return the sum of columns, rows and diagonals
     int arrLen = [array count];
-    NSMutableArray *storeSumsArray = [NSMutableArray array]; // [V1 V2 V3... H1 H2 H3... D1 D2]
+    NSMutableArray *colRowDiagArray = [NSMutableArray array]; // [C1 C2 Cn... R1 R2 Rn... D1 D2] of len 2n + 2
     
     // check columns
     for (int i = 0; i < arrLen; i++){
-        int colSum = 0;
+        NSMutableArray *tempArr = [NSMutableArray array];
         for (int j = 0; j < arrLen; j++){
-            colSum = colSum + ((Tile *)self.buttonsArray[i][j]).myState;
+            [tempArr addObject:[NSNumber numberWithInt:((Tile *)self.buttonsArray[i][j]).myState]];
         }
-        [storeSumsArray addObject:[NSNumber numberWithInt:colSum]];
+        [colRowDiagArray addObject:tempArr];
     }
     
     // check rows
     for (int j = 0; j < arrLen; j++){
-        int rowSum = 0;
+        NSMutableArray *tempArr = [NSMutableArray array];
         for (int i = 0; i < arrLen; i++){
-            rowSum = rowSum + ((Tile *)self.buttonsArray[i][j]).myState;
+            [tempArr addObject:[NSNumber numberWithInt:((Tile *)self.buttonsArray[i][j]).myState]];
         }
-        [storeSumsArray addObject:[NSNumber numberWithInt:rowSum]];
+        [colRowDiagArray addObject:tempArr];
         
     }
     
     // check diagonals
-    int dia1Sum = 0;
-    int dia2Sum = 0;
+    NSMutableArray *dia1Arr = [NSMutableArray array];
+    NSMutableArray *dia2Arr = [NSMutableArray array];
     for (int i = 0; i < arrLen; i++){
-        dia1Sum = dia1Sum + ((Tile *)self.buttonsArray[i][i]).myState;
-        dia2Sum = dia2Sum + ((Tile *)self.buttonsArray[i][arrLen -1 - i]).myState;
+        [dia1Arr addObject:[NSNumber numberWithInt: ((Tile *)self.buttonsArray[i][i]).myState]];
+        [dia2Arr addObject:[NSNumber numberWithInt: ((Tile *)self.buttonsArray[i][arrLen -1 - i]).myState]];
     }
-    [storeSumsArray addObject:[NSNumber numberWithInt:dia1Sum]];
-    [storeSumsArray addObject:[NSNumber numberWithInt:dia2Sum]];
+    [colRowDiagArray addObject:dia1Arr];
+    [colRowDiagArray addObject:dia2Arr];
     
-    return storeSumsArray;
+    return colRowDiagArray;
 }
 
--(void)makeBestMoveWithTilesArray:(NSMutableArray *)tileArr
-                    andWithSumArr:(NSMutableArray *)sumArr
+-(void)computerMove:(NSMutableArray *)tileArr
+                    withColRowDiagArr:(NSMutableArray *)colRowDiagArr
                       andGridSize:(int)gridSize
                      andIsXPlayer:(bool)isXPlayer {
     
-    // use closure to find highest value play in columnRowDiagnoal matrix
-    __block NSUInteger maxIndex;
-    __block NSNumber* maxValue = [NSNumber numberWithFloat:0];
-    __block NSUInteger minIndex;
-    __block NSNumber* minValue = [NSNumber numberWithFloat:0];
-    [sumArr enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if (obj > maxValue) {
-            maxValue = obj;
-            maxIndex = idx;
+    NSLog(@"its the computer's move...");
+    
+    // count the sets
+    // if -2 do something if 2 do something
+    // else random
+    
+    __block NSNumber * maxSum;
+    __block NSNumber * minSum;
+    __block NSNumber * arrIndexAtMax;
+    __block NSNumber * posIndexAtMax;
+    __block NSNumber * arrIndexAtMin;
+    __block NSNumber * posIndexAtMin;
+    [colRowDiagArr enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        NSNumber *sum = 0;
+        for (NSNumber *val in obj){
+            sum = [NSNumber numberWithInt:([sum integerValue] + [val integerValue])];
         }
-        if (obj < minValue) {
-            minValue = obj;
-            minIndex = idx;
+        if ([sum integerValue] > [maxSum integerValue]){
+            maxSum = sum;
+            arrIndexAtMax = [NSNumber numberWithInt:idx];
+            posIndexAtMax = [NSNumber numberWithInt:[obj indexOfObject:[NSNumber numberWithInt:0]]];
+        }
+        if ([sum integerValue] < [minSum integerValue]){
+            minSum = sum;
+            arrIndexAtMin = [NSNumber numberWithInt:idx];
+            posIndexAtMin = [NSNumber numberWithInt:[obj indexOfObject:[NSNumber numberWithInt:0]]];
         }
     }];
-    NSMutableArray *debuggingArray = sumArr; 
-    NSLog(@"%tu", maxIndex);
     
-    // can I win?
+    NSLog(@"minSum is %d, maxSum is %d", [minSum integerValue], [maxSum integerValue]);
+    NSMutableArray * debuggingArr = colRowDiagArr;
     
-    // can I block
-    
-    // random
-    
-    // until a move is made, identify the highest value column, row, or diagonal and search it for first empty tile
-    bool isMoveMade = NO; // while loop break condition
-    for (int i = 0; i < gridSize - 1; i++){
-        if (!isMoveMade){
-            if (maxIndex < gridSize){
-                // columns
-                Tile *tile = ((Tile *)tileArr[maxIndex][i]);
-                if (tile.myState == 0 ) {
-                    // make move
-                    [tile onClickWithXPlayer:isXPlayer];
-                    isMoveMade = YES;
-                }
-            } else if (maxIndex < gridSize * 2){
-                // rows
-                Tile *tile = ((Tile *)tileArr[i][maxIndex-gridSize]);
-                if (tile.myState == 0) {
-                    // make move
-                    [tile onClickWithXPlayer:isXPlayer];
-                    isMoveMade = YES;
-                }
-            } else if (maxIndex == gridSize * 2){
-                // d1
-                Tile *tile = ((Tile *)tileArr[i][gridSize - i - 1]);
-                if (tile.myState == 0) {
-                    // make move
-                    [tile onClickWithXPlayer:isXPlayer];
-                    isMoveMade = YES;
-                }
-            } else if (maxIndex == gridSize * 2 + 1){
-                // d1
-                Tile *tile = ((Tile *)tileArr[gridSize - i - 1][i]);
-                if (tile.myState == 0)  {
-                    // make move
-                    [tile onClickWithXPlayer:isXPlayer];
-                    isMoveMade = YES;
-                }
-            } else {
-                for (int j = 0; j < gridSize - 1; j++){
-                    Tile *tile = ((Tile *)tileArr[gridSize - i - 1][i]);
-                    if (tile.myState == 0)  {
-                        // make move
-                        [tile onClickWithXPlayer:isXPlayer];
-                        isMoveMade = YES;
-                    }
-                }
+    if (([maxSum integerValue] == gridSize - 1) || ([minSum integerValue] == -1 * gridSize + 1)){
+
+        int arrIndex;
+        int posIndex;
+        if ([maxSum integerValue] == gridSize - 1){
+            // block
+            NSLog(@"blocking");
+            arrIndex = [arrIndexAtMax integerValue];
+            posIndex = [posIndexAtMax integerValue];
+        } else if ([minSum integerValue] == -1 * gridSize + 1) {
+            // win
+            NSLog(@"trying to win");
+            arrIndex = [arrIndexAtMin integerValue];
+            posIndex = [posIndexAtMin integerValue];
+        }
+        NSLog(@"arrIndex is %d, posIndex %d", arrIndex, posIndex);
+        
+        if (arrIndex < gridSize){
+            NSLog(@"1");
+            [((Tile *)tileArr[arrIndex][posIndex]) onClickWithXPlayer:isXPlayer];
+            
+        } else if (arrIndex < gridSize * 2){
+            NSLog(@"2");
+            [((Tile *)tileArr[posIndex][abs(gridSize - arrIndex)]) onClickWithXPlayer:isXPlayer];
+            
+        } else if (arrIndex == gridSize * 2){
+            NSLog(@"3");
+            [((Tile *)tileArr[posIndex][posIndex]) onClickWithXPlayer:isXPlayer];
+            NSLog(@"tile state is %d", ((Tile *)tileArr[posIndex][posIndex]).myState);
+        } else if (arrIndex == gridSize * 2 + 1){
+            NSLog(@"4");
+            [((Tile *)tileArr[gridSize - posIndex - 1][gridSize - posIndex -1]) onClickWithXPlayer:isXPlayer];
+        
+        }
+    } else {
+        // make a random move
+        NSLog(@"random");
+        bool moveMade = NO;
+        while (!moveMade){
+            int rand1 = arc4random() % gridSize;
+            int rand2 = arc4random() % gridSize;
+            Tile *tempTile = ((Tile *)tileArr[rand1][rand2]);
+            if (tempTile.myState == 0){
+                [tempTile onClickWithXPlayer:isXPlayer];
+                moveMade = YES;
             }
         }
     }
@@ -205,8 +228,8 @@
 
     // player
     [sender onClickWithXPlayer:YES]; // use X image
-    NSMutableArray *scoresArr = [self sumRowsColumnsAndDiagonals:self.buttonsArray];
-    bool isWinner = [self isWinnerWithArray:scoresArr withGridSize:self.gridSize];
+    NSMutableArray *colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
+    bool isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
     if (isWinner){
       
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"You won!"
@@ -240,12 +263,13 @@
     self.movesMade++;
     
     // computer
-    [self makeBestMoveWithTilesArray:self.buttonsArray
-                       andWithSumArr:scoresArr
+    [self computerMove:self.buttonsArray
+                       withColRowDiagArr:colRowDiagStates
                          andGridSize:self.gridSize
                         andIsXPlayer:NO];
-    scoresArr = [self sumRowsColumnsAndDiagonals:self.buttonsArray];
-    isWinner = [self isWinnerWithArray:scoresArr withGridSize:self.gridSize];
+    
+    colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
+    isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
     
     if (isWinner){
         
