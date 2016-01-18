@@ -22,7 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.gridSize = 5;
+    self.gridSize = 4;
     self.movesMade = 0;
     [self makeGridOfColumns:self.gridSize andRows:self.gridSize];
 }
@@ -227,82 +227,81 @@
 -(IBAction)onSelectTile:(Tile *)sender{
 
     // player
-    [sender onClickWithXPlayer:YES]; // use X image
-    NSMutableArray *colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
-    bool isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
-    if (isWinner){
-      
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"You won!"
-                                                                                 message:@"Play Again?"
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [alertController dismissViewControllerAnimated:YES completion:nil];
-        }];
-        
-        [alertController addAction:restart];
-        [self presentViewController:alertController animated:YES completion:^{
-            [self restartGame];
-        }];
+    if (sender.myState == 0){
+        [sender onClickWithXPlayer:YES]; // use X image
+        self.movesMade++;
+        NSLog(@"moves made %d", self.movesMade);
+        NSMutableArray *colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
+        bool isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
+        if (isWinner){
+          
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"You won!"
+                                                                                     message:@"Play Again?"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [alertController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            
+            [alertController addAction:restart];
+            [self presentViewController:alertController animated:YES completion:^{
+                [self restartGame];
+            }];
 
-    } else if (self.movesMade == pow(self.gridSize, 2)){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tie"
-                                                                                 message:@"Play Again?"
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        } else if (self.movesMade == pow(self.gridSize, 2)){
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tie"
+                                                                                     message:@"Play Again?"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [alertController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            
+            [alertController addAction:restart];
+            [self presentViewController:alertController animated:YES completion:^{
+                [self restartGame];
+            }];
+            }
+        // computer
+        [self computerMove:self.buttonsArray
+                           withColRowDiagArr:colRowDiagStates
+                             andGridSize:self.gridSize
+                            andIsXPlayer:NO];
+        self.movesMade++;
+        NSLog(@"moved made %d", self.movesMade);
+        colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
+        isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
         
-        UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [alertController dismissViewControllerAnimated:YES completion:nil];
-        }];
-        
-        [alertController addAction:restart];
-        [self presentViewController:alertController animated:YES completion:^{
-            [self restartGame];
-        }];
+        if (isWinner){
+            
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"You lost, foo!"
+                                                                                     message:@"Play Again?"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [alertController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            
+            [alertController addAction:restart];
+            [self presentViewController:alertController animated:YES completion:^{
+                [self restartGame];
+            }];
+            
+        } else if (self.movesMade == pow(self.gridSize, 2)){
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tie"
+                                                                                     message:@"Play Again?"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [alertController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            
+            [alertController addAction:restart];
+            [self presentViewController:alertController animated:YES completion:^{
+                [self restartGame];
+            }];
+        }
     }
-    
-    self.movesMade++;
-    
-    // computer
-    [self computerMove:self.buttonsArray
-                       withColRowDiagArr:colRowDiagStates
-                         andGridSize:self.gridSize
-                        andIsXPlayer:NO];
-    
-    colRowDiagStates = [self colRowDiagStates:self.buttonsArray];
-    isWinner = [self isWinnerWithArray:colRowDiagStates withGridSize:self.gridSize];
-    
-    if (isWinner){
-        
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"You lost, foo!"
-                                                                                 message:@"Play Again?"
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [alertController dismissViewControllerAnimated:YES completion:nil];
-        }];
-        
-        [alertController addAction:restart];
-        [self presentViewController:alertController animated:YES completion:^{
-            [self restartGame];
-        }];
-        
-    } else if (self.movesMade == pow(self.gridSize, 2)){
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tie"
-                                                                                 message:@"Play Again?"
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *restart = [UIAlertAction actionWithTitle:@"restart" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [alertController dismissViewControllerAnimated:YES completion:nil];
-        }];
-        
-        [alertController addAction:restart];
-        [self presentViewController:alertController animated:YES completion:^{
-            [self restartGame];
-        }];
-    }
-    
-    self.movesMade++;
-    
 }
 
 
